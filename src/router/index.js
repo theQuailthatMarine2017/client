@@ -11,6 +11,12 @@ Vue.use(VueRouter)
     component: Home
   },
   {
+    path:'/register',
+    name:'Register',
+    component: () => import(/* webpackChunkName: "about" */ '../views/Register.vue')
+
+  },
+  {
     path: '/playmovie/',
     name: 'PlayMovie',
     // route level code-splitting

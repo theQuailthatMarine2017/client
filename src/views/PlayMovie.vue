@@ -1,11 +1,17 @@
 <template>
   <div class="video">
-    <v-app-bar style="background-color:#8b0000;">
-      <v-toolbar-title style="color:white;" class="font-weight-bold ml-0 pl-4">
-        <span>Q-Fliqs</span>
-      </v-toolbar-title>
-      <v-spacer />
-    </v-app-bar>
+
+    <v-toolbar color="transparent" height="95px;">
+      <img src="../../public/img/logo.png" height="90px">
+      <v-spacer></v-spacer>
+      <v-toolbar-items>
+         <v-btn
+          v-for="item in menu"
+          :key="item.icon"
+          :to="item.link"
+        >{{ item.title }}</v-btn>
+      </v-toolbar-items>
+    </v-toolbar>
 
     <v-container v-if="movie_source != ''">
         <video class="video-size"  controls>
@@ -25,16 +31,19 @@ export default {
   },
     data(){
         return{
-          movie_source:''
+          movie_source:'',
+          menu: [
+        { icon: 'home', title: 'Back' }
+      ],
         }
     },
 
     methods:{
       play(){
 
-        axios.get('http://62.8.92.158:4000/api/q-flix/get_movie/'+this.$route.params.movie).then(response => {
+        axios.get('http://62.8.71.129:8500/api/q-flix/get_movie/'+this.$route.params.movie).then(response => {
 
-             this.movie_source = "http://62.8.92.158:4000/api/q-flix/play/"+response.data[0]._id
+             this.movie_source = "http://62.8.71.129:8500/api/q-flix/play/"+response.data[0]._id
              console.log(this.movie_source)
 
 
