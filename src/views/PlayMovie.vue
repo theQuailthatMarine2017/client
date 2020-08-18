@@ -1,13 +1,15 @@
 <template>
+<div class="register">
   <div class="video">
 
-    <v-toolbar color="transparent" height="95px;">
+    <v-toolbar color="black" height="95px;">
       <img src="../../public/img/logo.png" height="90px">
       <v-spacer></v-spacer>
       <v-toolbar-items>
          <v-btn
           v-for="item in menu"
           :key="item.icon"
+          @click="goBack()"
           :to="item.link"
         >{{ item.title }}</v-btn>
       </v-toolbar-items>
@@ -18,6 +20,7 @@
             <source :src="movie_source" type="video/mp4">
             </video>
     </v-container>
+  </div>
   </div>
 </template>
 
@@ -49,12 +52,29 @@ export default {
 
           })
 
+      },
+      goBack(){
+
+        this.$router.push('/')
       }
     }
 }
 </script>
 
 <style scoped>
+
+.register{
+    background-image: url("https://storemedia.cineplex.com/ways-to-watch/background/desktop-waystowatch-bb.jpg");
+    
+    
+    min-height:100vh;
+    
+    background-position: center;
+    background-attachment: fixed;
+    background-size: cover;
+    overflow: hidden;
+    flex: 1 0 auto;
+}
 
 .video{
   height:100%;

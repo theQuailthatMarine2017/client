@@ -1,7 +1,30 @@
 <template>
   <div class="home">
 
-    <v-toolbar color="black" height="95px;">
+    <v-toolbar color="black" height="95px;" v-if="user_status === 'signed in'">
+      <img src="../../public/img/logo.png" height="90px">
+      <v-spacer></v-spacer>
+      <v-toolbar-items ref="signoff">
+         <v-btn @click="signout"
+         style="margin-right:10px;"
+          v-for="item in menu2"
+          :key="item.icon"
+          :to="item.link"
+        >{{ item.title }}</v-btn>
+      </v-toolbar-items>
+      <v-menu class="hidden-md-and-up">
+        
+        <v-list>
+          <v-list-tile v-for="item in menu2" :key="item.icon">
+            <v-list-tile-content>
+              <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+             </v-list-tile-content>
+          </v-list-tile>   
+        </v-list>
+      </v-menu>
+    </v-toolbar>
+
+    <v-toolbar color="black" height="95px;" v-if="user_status === 'not signed in'">
       <img src="../../public/img/logo.png" height="90px">
       <v-spacer></v-spacer>
       <v-toolbar-items>
@@ -12,7 +35,7 @@
         >{{ item.title }}</v-btn>
       </v-toolbar-items>
       <v-menu class="hidden-md-and-up">
-        <v-toolbar-side-icon slot="activator"></v-toolbar-side-icon>
+        
         <v-list>
           <v-list-tile v-for="item in menu" :key="item.icon">
             <v-list-tile-content>
@@ -23,7 +46,7 @@
       </v-menu>
     </v-toolbar>
 
-    <v-container grid-list-md style="margin-top:90px;color:white;">
+    <v-container ref="movies" grid-list-md style="margin-top:90px;color:white;">
 
       <div class="banner-ad">
   </div> 
@@ -31,15 +54,15 @@
       <h1 style="font-weight:bolder;-webkit-background-clip: text;">What's Hot</h1>
 
     <carousel :loop="true" 
- paginationColor="#ffffff" paginationActiveColor="#ff0000" :navigationStyle="nav-b" navigationEnabled autoplay paginationEnabled="false" :perPageCustom="[[768, 6], [480, 2]]">
+ paginationColor="#ffffff" paginationActiveColor="#ff0000" navigationEnabled autoplay :paginationEnabled="false" :perPageCustom="[[768, 6], [480, 2]]">
   <slide v-for="movie in movies" :key="movie._id">
-    <img @click="test" class="img-size" height="200px;" width="180px;" :src="movie.imgPath">
+    <img @click="getmovie(movie._id)" class="img-size" height="200px;" width="180px;" :src="movie.imgPath">
   </slide>
 </carousel>
 
 <h1 style="font-weight:bolder;-webkit-background-clip: text;">Live Streams</h1>
 <carousel :loop="true" 
- paginationColor="#ffffff" paginationActiveColor="#ff0000" :navigationStyle="nav-b" navigationEnabled autoplay paginationEnabled="false" :perPageCustom="[[768, 6], [480, 2]]">
+ paginationColor="#ffffff" paginationActiveColor="#ff0000" navigationEnabled autoplay :paginationEnabled="false" :perPageCustom="[[768, 6], [480, 2]]">
   <slide v-for="movie in movies" :key="movie._id">
     <img @click="test" class="img-size" height="200px;" width="180px;" :src="movie.imgPath">
   </slide>
@@ -52,6 +75,7 @@
 <v-dialog
       v-model="dialog"
       width="500"
+      ref="signin"
     >
 
       <v-card>
@@ -65,11 +89,10 @@
 
         <v-card-text>
           <v-col cols="12">
-                <v-text-field hide-details label="Email / Mobile" required></v-text-field>
-                <v-text-field hide-details label="Password" type="password" required></v-text-field>
+                <v-text-field v-model="email_mobile" hide-details label="Email / Mobile" required></v-text-field>
+                <v-text-field v-model="password" hide-details label="Password" type="password" required></v-text-field>
               </v-col>
-              <v-btn block large color="black" style="color:white;">SIGN IN</v-btn>
-              <p style="text-align:center;color:black;font-weight:bolder;">Don't Have An Account?</p>
+              <v-btn block large color="black" @click="login_user" style="color:white;margin-bottom:5px;">SIGN IN</v-btn>
               <v-btn block href="/register" large color="red">CREATE ACCOUNT</v-btn>
               <p style="text-align:center;color:black;font-weight:bolder;margin:0px;">Forgot Password? Click Here</p>
         </v-card-text>
@@ -98,6 +121,7 @@
 <script>
 // @ is an alias to /src
 import axios from 'axios';
+import { mapGetters, mapActions } from "vuex";
 
 export default {
   name: 'carrousel',
@@ -116,57 +140,169 @@ export default {
       menu: [
         { icon: 'home', title: 'Sign In' }
       ],
+      menu2: [
+        { icon: 'home', title: 'Sign Out' }
+      ],
         movieplay:false,
         dialog:false,
         isComponentModalActive:false,
+        email_mobile:null,
+        password:null,
         movie_source:'',
         movie_title:'',
         movies:null,
+        user_status:'not signed in'
       }
     },
     computed: {
-      swiper() {
-        return this.$refs.mySwiper.$swiper
-      },
-      navigationNext: function() { return `<i class="fas fa-chevron-right"></i>` },
+      ...mapGetters(["token","err"]),
+      
     },
     mounted(){
-
+      // console.log(localStorage.getItem('verify_token') + localStorage.getItem('email_mobile'))
         this.getmovies()
+        
+        //Check localstorage for token. If present user_status is signed in if not user isnt
+        // if (localStorage.getItem('verify') === null){
 
-        console.log('Current Swiper instance object', this.swiper)
-        this.swiper.slideTo(3, 1000, false)
+        //   this.dialog = true
+        // }
+
+        // //Check localstorage for tokens. If none present user_status is not signed in
+        // if (localStorage.getItem('sign_in_token') === null && localStorage.getItem('verify_token') === null){
+
+        //   this.dialog = true
+
+        // }
+        this.check_status()
+
     },
     methods:{
+      ...mapActions(["login","signOut"]),
         getmovies(){
 
+                this.loader = this.$loading.show({
+                    // Optional parameters
+                    color: '#ff0000',
+                    container: this.$refs.movies.$el,
+                    canCancel:true,
+                    width: 75,
+                    height: 75,
+                    opacity: 0.7,
+                    
+                  });
 
             axios.get('http://62.8.71.129:8500/api/q-flix/movies').then( response => {
 
               this.movies =  response.data
               console.log("Movies" + this.movies[0])
 
+              this.loader.hide()
+
             })
             
+        },
+        check_status(){
+
+          if(localStorage.getItem('sign_in_token') === null){
+
+            this.user_status = 'not signed in'
+
+          }else {
+
+            this.user_status = 'signed in'
+          }
+
         },
         menuItems () {
       return this.menu
     },
         getmovie(id){
 
+          if(localStorage.getItem('verified_status') === 'true'){
 
-          this.$router.push({ name:'PlayMovie', params: { movie: id }})
+            this.$router.push({ name:'PlayMovie', params: { movie: id }})
+
+          } else {
+
+                this.dialog = true
+
+          }
 
         },
-        goToRegister(){
-          
-          this.$router.push('/register')
+        login_user(){
+
+          this.loader = this.$loading.show({
+                    // Optional parameters
+                    color: '#ff0000',
+                    container: this.$refs.signin.$el,
+                    canCancel:true,
+                    width: 75,
+                    height: 75,
+                    opacity: 0.7,
+                    
+                  });
+
+          this.login({email_mobile:this.email_mobile,password:this.password})
+
+        },
+        signout(){
+
+          this.loader = this.$loading.show({
+                    // Optional parameters
+                    color: '#ff0000',
+                    container: this.$refs.signoff.$el,
+                    canCancel:true,
+                    width: 75,
+                    height: 75,
+                    opacity: 0.7,
+                    
+                  });
+
+          this.signOut({email_mobile:localStorage.getItem('user_email_mobile')})
+
+        },
+        test(){
+
+          console.log('ksksksks')
         },
         stopmovie(){
 
           this.movie_source = '',
           this.movieplay = false
         }
+    },
+    watch:{
+      token(val){
+
+        if(val != null){
+
+          this.loader.hide()
+          this.user_status = 'signed in'
+          this.check_status()
+
+        }else{
+
+          this.loader.hide()
+          this.user_status = 'not signed in'
+          this.check_status()
+
+        }
+      },
+      err(val){
+
+        if (val != null){
+
+          console.log(val + "jhvjvjhvjhjvjhbjhjhjbbbjhbjb")
+          this.loader.hide()
+          this.user_status = 'not signed in'
+          this.$swal(val,
+              
+              'warning');
+
+        }
+
+      }
     }
 }
 </script>
@@ -182,17 +318,17 @@ export default {
 }
 
 .banner-ad-2{
-  height:60px;
-  background: url(https://i.ibb.co/p4mtRVQ/banner.jpg); 
+  height:120px;
+  background: url(https://urbankenyans.com/wp-content/uploads/2017/11/masoko-by-safaricom.jpg); 
   background-repeat: no-repeat;
-  background-size:500px 60px;
+  background-size:500px 120px;
   object-fit:contain;
 }
 
 @media only screen and (max-width: 450px) {
   .banner-ad-2 {
     height:60px;
-  background: url(https://i.ibb.co/p4mtRVQ/banner.jpg); 
+  background: url(https://urbankenyans.com/wp-content/uploads/2017/11/masoko-by-safaricom.jpg); 
   background-repeat: no-repeat;
   background-size:365px 60px;
   object-fit:contain;
@@ -280,23 +416,6 @@ header {
     z-index: 999;
     background: rgba(156, 11, 11, 0.95);
     box-shadow: 0 10px 20px rgba(59, 11, 11, 0.95);
-}
-
-nav {
-    margin-top: 10px;
-    -webkit-border-radius: 5px;
-    -moz-border-radius: 5px;
-    border-radius: 5px;
-    height:auto;
-}
-
-nav a {
-    font: 1.2em/1em sans-serif;
-    display: inline-block;
-    padding: 10px 15px;
-    float: right;
-    text-decoration: none;
-    color: white;
 }
 
 </style>

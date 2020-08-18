@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
+// import authenticate from "../auth/autheticate";
 
 Vue.use(VueRouter)
 
@@ -14,6 +15,12 @@ Vue.use(VueRouter)
     path:'/register',
     name:'Register',
     component: () => import(/* webpackChunkName: "about" */ '../views/Register.vue')
+
+  },
+  {
+    path:'/verify-account',
+    name:'Verify',
+    component: () => import(/* webpackChunkName: "about" */ '../views/Verify.vue')
 
   },
   {
