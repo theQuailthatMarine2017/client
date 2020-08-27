@@ -60,7 +60,23 @@
   </slide>
 </carousel>
 
-<h1 style="font-weight:bolder;-webkit-background-clip: text;">Live Streams</h1>
+<h1 style="font-weight:bolder;-webkit-background-clip: text;">New Movies</h1>
+<carousel :loop="true" 
+ paginationColor="#ffffff" paginationActiveColor="#ff0000" navigationEnabled autoplay :paginationEnabled="false" :perPageCustom="[[768, 6], [480, 2]]">
+  <slide v-for="movie in movies" :key="movie._id">
+    <img @click="test" class="img-size" height="200px;" width="180px;" :src="movie.imgPath">
+  </slide>
+</carousel>
+
+<h1 style="font-weight:bolder;-webkit-background-clip: text;">Short Movies</h1>
+<carousel :loop="true" 
+ paginationColor="#ffffff" paginationActiveColor="#ff0000" navigationEnabled autoplay :paginationEnabled="false" :perPageCustom="[[768, 6], [480, 2]]">
+  <slide v-for="movie in movies" :key="movie._id">
+    <img @click="test" class="img-size" height="200px;" width="180px;" :src="movie.imgPath">
+  </slide>
+</carousel>
+
+<h1 style="font-weight:bolder;-webkit-background-clip: text;">Documentaries</h1>
 <carousel :loop="true" 
  paginationColor="#ffffff" paginationActiveColor="#ff0000" navigationEnabled autoplay :paginationEnabled="false" :perPageCustom="[[768, 6], [480, 2]]">
   <slide v-for="movie in movies" :key="movie._id">
@@ -155,7 +171,7 @@ export default {
       }
     },
     computed: {
-      ...mapGetters(["token","err"]),
+      ...mapGetters(["sign_in_token","err"]),
       
     },
     mounted(){
@@ -199,6 +215,7 @@ export default {
 
               this.loader.hide()
 
+
             })
             
         },
@@ -207,10 +224,12 @@ export default {
           if(localStorage.getItem('sign_in_token') === null){
 
             this.user_status = 'not signed in'
+            this.loader.hide()
 
           }else {
 
             this.user_status = 'signed in'
+            this.loader.hide()
           }
 
         },
@@ -223,11 +242,21 @@ export default {
 
             this.$router.push({ name:'PlayMovie', params: { movie: id }})
 
-          } else {
+          } else if(localStorage.getItem('sign_in_token') === null){
 
                 this.dialog = true
 
+          } else if((localStorage.getItem('verified_status') === 'false')){
+
+            this.$router.push('/verify-account')
+
+          } else{
+
+            this.dialog = true
+
           }
+
+          
 
         },
         login_user(){
@@ -273,17 +302,16 @@ export default {
         }
     },
     watch:{
-      token(val){
+      sign_in_token(val){
 
         if(val != null){
 
-          this.loader.hide()
+          this.dialog = false
           this.user_status = 'signed in'
           this.check_status()
 
         }else{
 
-          this.loader.hide()
           this.user_status = 'not signed in'
           this.check_status()
 
@@ -293,12 +321,13 @@ export default {
 
         if (val != null){
 
-          console.log(val + "jhvjvjhvjhjvjhbjhjhjbbbjhbjb")
           this.loader.hide()
+        
+
+          this.$awn.alert(val)
+
           this.user_status = 'not signed in'
-          this.$swal(val,
-              
-              'warning');
+  
 
         }
 

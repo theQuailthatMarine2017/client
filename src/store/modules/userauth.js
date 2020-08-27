@@ -3,17 +3,23 @@ import axios from 'axios';
 export default {
   state: {
     err:null,
-    token:null,
+    sign_in_token:null,
+    verify_token:null
   },
   getters: {
     err: state => state.err,
-    token: state => state.token,
+    sign_in_token: state => state.sign_in_token,
+    verify_token: state => state.verify_token,
   },
   mutations: {
-    AddToken(state, data){
+    AddSignInToken(state, data){
 
-        state.token = data;
+        state.sign_in_token = data;
     },
+    AddVerifyToken(state, data){
+
+      state.verify_token = data;
+  },
     AddError(state,data){
 
         state.err = data;
@@ -24,7 +30,8 @@ export default {
     },
     LoggOff(state){
 
-        state.token = null;
+        state.sign_in_token = null;
+        state.verify_token = null;
         state.err = null;
     },
   },
@@ -33,28 +40,48 @@ export default {
 
       console.log(data)
 
+      commit("AddError", null)
           axios.post('http://localhost:9100/api/q-flix/login-user', data).then( response => {
 
             console.log(response.data);
             
-            localStorage.setItem("sign_token", response.data.token);
-            localStorage.setItem("user_email_mobile", response.data.user_account.email_mobile);
+            localStorage.setItem("sign_in_token", response.data.token);
+            localStorage.setItem("user_email_mobile", response.data.email_mobile);
+            localStorage.setItem("verified_status", response.data.verified);
 
-            commit("AddToken",response.data.token);
-
+            commit("AddSignInToken",response.data.token);
 
           }).catch( err => {
-              console.log("Request Error App: " + typeof err.toString);
 
-              if(err === 'Error: Request failed with status code 403'){
-                console.log('fewreirfbmo')
+              console.log(err.message);
+
+              if(err.message === "Request failed with status code 403"){
+
+                var error_password = "Wrong Password"
+                commit("AddError", error_password)
+                
               }
-              commit("AddError", err)
+
+              if(err.message === "Request failed with status code 401"){
+
+                var error_email = "User Does Not Exist. Check Email Address"
+                commit("AddError", error_email)
+                
+              }
+
+              if(err.message === "Request failed with status code 500"){
+
+                var error_unknown = "Server Error"
+                commit("AddError", error_unknown)
+                
+              }
 
           })
 
     },
     createuser({commit}, data) {
+
+      commit("AddError", null)
 
       console.log(data)
 
@@ -65,13 +92,13 @@ export default {
             localStorage.setItem("verify_token", response.data.token);
             localStorage.setItem("user_email_mobile", response.data.email_mobile);
             
-            commit("AddToken",response.data.token);
+            commit("AddVerifyToken",response.data.token);
 
       }).catch( err => {
 
-        if(err === 'Error: Request failed with status code 500'){
+        if(err.message === 'Request failed with status code 500'){
 
-            var error = 'Password Incorrect'
+            var error = 'Server Error.'
             console.log("Request Error App: " + error);
             commit("AddError", error)
 
@@ -80,22 +107,34 @@ export default {
     },
     verify({commit},data){
 
+      commit("AddError", null)
+
       axios.post('http://localhost:9100/api/q-flix/verify-user',data).then( response => {
 
         if(response.data.title === 'verified'){
 
           localStorage.setItem("sign_in_token", response.data.token);
           localStorage.setItem("user_email_mobile", response.data.email_mobile);
-          localStorage.setItem("verified_status", response.data.verified);
 
+          commit("AddSignInToken",response.data.token);
 
-          commit("AddToken",response.data.token);
         }
 
       }).catch( err => {
 
-            console.log("Verify Error App: " + err);
-            commit("AddError", err)
+        if(err.message === 'Request failed with status code 401'){
+
+          var error = 'Unknown Error'
+          console.log("Verify Error App: " + error);
+          commit("AddError", error)
+        }
+
+        if(err.message === 'Request failed with status code 500'){
+
+          var error_email_mobile = 'Unknown Error'
+          console.log("Verify Error App: " + error_email_mobile);
+          commit("AddError", error_email_mobile)
+        }
 
       })
     },
@@ -111,6 +150,13 @@ export default {
           }
 
       }).catch( err => {
+
+        if(err === 'Request failed with status code 500'){
+
+          var error = 'Unknown Error'
+          console.log("Request Error App: " + error);
+           commit("AddError", error)
+       }
 
             console.log("Request Error App: " + err);
             commit("AddError", err.title)

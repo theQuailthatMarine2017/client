@@ -15,6 +15,10 @@ import 'vue-loading-overlay/dist/vue-loading.css';
 import VueSweetalert2 from 'vue-sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
 import { VueReCaptcha } from 'vue-recaptcha-v3'
+import VueAWN from "vue-awesome-notifications"
+
+
+Vue.use(VueAWN)
 
 library.add(faUserSecret)
 
@@ -28,6 +32,8 @@ Vue.use(VueCarousel);
 
 // import style
 import 'swiper/css/swiper.css'
+import 'vue-awesome-notifications/dist/styles/style.css';
+
 
 Vue.use(VueAwesomeSwiper, /* { default options with global component } */)
 

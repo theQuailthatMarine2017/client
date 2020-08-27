@@ -105,10 +105,10 @@ export default{
         }
     },
     computed:{
-      ...mapGetters(["token"]),
+      ...mapGetters(["sign_in_token"]),
     },
     watch:{
-      token(val){
+      sign_in_token(val){
         if(val != null){
 
           //Registration succesful
@@ -121,10 +121,7 @@ export default{
       err(val){
         if(val != null){
 
-          this.loader.hide()
-          this.$swal('Alert!',
-              val,
-              'warning');
+          this.$awn.alert(val)
 
         }
       }

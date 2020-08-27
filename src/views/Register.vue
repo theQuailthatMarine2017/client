@@ -195,10 +195,10 @@ export default{
         }
     },
     computed:{
-      ...mapGetters(["token"]),
+      ...mapGetters(["verify_token","err"]),
     },
     watch:{
-      token(val){
+      verify_token(val){
         if(val != null){
 
           //Registration succesful
@@ -206,6 +206,13 @@ export default{
           this.loader.hide()
           this.$router.push('/verify-account')
           
+        }
+      },
+      err(val){
+        if(val != null){
+
+          this.$awn.alert(val)
+
         }
       }
     }
