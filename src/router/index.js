@@ -24,6 +24,12 @@ Vue.use(VueRouter)
 
   },
   {
+    path:'/subscribe',
+    name:'Payments',
+    component: () => import(/* webpackChunkName: "about" */ '../views/Payment.vue')
+
+  },
+  {
     path: '/playmovie/',
     name: 'PlayMovie',
     // route level code-splitting

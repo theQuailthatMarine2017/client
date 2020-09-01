@@ -42,14 +42,7 @@
               solo-inverted
             ></v-text-field>
 
-            <v-text-field
-              v-model="email_mobile"
-              :rules="[() => !!email_mobile || 'This field is required']"
-              :error-messages="errorMessages"
-              label="Email or Mobile"
-              required
-              solo-inverted
-            ></v-text-field>
+            <vue-tel-input-vuetify :onlyCountries="countries" mode="international"  label="Enter Mobile Valid Number" v-model="mobile"></vue-tel-input-vuetify>
 
             <v-text-field
               v-model="password"
@@ -139,6 +132,7 @@ export default{
     show1: false,
     show2: true,
     show3: false,
+    countries:['KE'],
     show4: false,
     rules: {
       required: value => !!value || 'Paswword Required.',
@@ -150,7 +144,7 @@ export default{
     age:null,
     city:null,
     name: null,
-    email_mobile:null,
+    mobile:null,
     formHasErrors: false,
         }
     },
@@ -169,11 +163,12 @@ export default{
         },
         register(){
 
+          console.log(this.mobile)
           if(this.user_agreement === false || this.password === null || this.password.length < 8){
 
             this.$swal('Alert!',
               'Please Agree To User Agreement or Make Sure Your Password Is Not Less Than 8 Characters',
-              'warning');
+              'warning' + this.mobile);
             
           }else {
 
@@ -188,7 +183,7 @@ export default{
                     
                   });
 
-            this.createuser({fullnames:this.name,email_mobile:this.email_mobile,age:this.age,gender:this.gender,city:this.city,password:this.password})
+            this.createuser({fullnames:this.name,mobile:this.mobile,age:this.age,gender:this.gender,city:this.city,password:this.password})
 
           }
 
@@ -211,6 +206,7 @@ export default{
       err(val){
         if(val != null){
 
+          this.loader.hide()
           this.$awn.alert(val)
 
         }

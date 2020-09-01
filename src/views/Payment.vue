@@ -14,21 +14,12 @@
         </v-col>
         <v-col cols="12" md="8">
             <v-card ref="validate" style="text-align:center;" class="mt-5">
-                <img style="margin-top:19px;" src="https://cdn1.iconfinder.com/data/icons/basic-ui-icon-rounded-colored/512/icon-41-512.png" height="150px">
-                <h3 style="text-align:center;">Please Verify Your Account!</h3>
-                <p style="text-align:center;font-weight:bold">For Security and Account Validity Reasons, We Require That You Verify Your Account First.<br/><br/>Enter The Five Digit Code Sent To The Mobile Number You Registered Your Account With Below</p>
-                <v-text-field
-                    style="margin-left:10px;margin-right:10px;"
-                    v-model="name"
-                    placeholder="Enter Code"
-                    class="centered-input"
-                    centered
-                    required
-                    inverted
-                ></v-text-field>
-          
+                <img style="margin-top:19px;" src="https://www.optima.co.ke/web/image/product.template/50/image?unique=ef17b70" height="150px">
+                <h3 style="text-align:center;">Pay Your Monthly Subscription with Mpesa Online!</h3>
+                <p style="text-align:center;font-weight:bold">Your Monthly Subscription of KSH 350 Will Be Charged To 0705009784.</p>
+                <p style="text-align:center;font-weight:bold">Please Have Your Mobile With You To Complete Payment Proccess.</p>
           <v-card-actions>
-            <v-btn block color="black" @click="recaptcha" style="color:white;">Click Here To Verify Account</v-btn>
+            <v-btn block color="black" @click="recaptcha" style="color:white;">Click Here To Pay Subscription</v-btn>
           </v-card-actions>
         </v-card>
   
@@ -90,7 +81,7 @@ export default{
                     
                   });
 
-              this.verify({mobile:localStorage.getItem('user_mobile'),pass_code:this.name})
+              this.verify({email_mobile:localStorage.getItem('user_email_mobile')})
 
             }
 
@@ -113,7 +104,7 @@ export default{
           //Registration succesful
 
           this.loader.hide()
-          this.$router.push('/subscribe')
+          this.$router.push('/')
           
         }
       },

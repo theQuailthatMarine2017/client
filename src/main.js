@@ -16,7 +16,11 @@ import VueSweetalert2 from 'vue-sweetalert2';
 import 'sweetalert2/dist/sweetalert2.min.css';
 import { VueReCaptcha } from 'vue-recaptcha-v3'
 import VueAWN from "vue-awesome-notifications"
-
+import VueTelInputVuetify from 'vue-tel-input-vuetify/lib';
+ 
+Vue.use(VueTelInputVuetify, {
+  vuetify,
+});
 
 Vue.use(VueAWN)
 

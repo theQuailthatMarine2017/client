@@ -219,6 +219,19 @@ export default {
             })
             
         },
+        check_subscribtion(){
+
+          if(localStorage.getItem('subscribed') === 'false'){
+
+            this.$router.push('/subscribe')
+            this.loader.hide()
+
+          }else {
+
+            this.loader.hide()
+          }
+
+        },
         check_status(){
 
           if(localStorage.getItem('sign_in_token') === null){
@@ -230,6 +243,7 @@ export default {
 
             this.user_status = 'signed in'
             this.loader.hide()
+            this.check_subscribtion()
           }
 
         },

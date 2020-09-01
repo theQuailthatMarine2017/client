@@ -41,12 +41,12 @@ export default {
       console.log(data)
 
       commit("AddError", null)
-          axios.post('http://localhost:9100/api/q-flix/login-user', data).then( response => {
+          axios.post('https://83b9599fb72c.ngrok.io/api/q-flix/login-user', data).then( response => {
 
             console.log(response.data);
             
             localStorage.setItem("sign_in_token", response.data.token);
-            localStorage.setItem("user_email_mobile", response.data.email_mobile);
+            localStorage.setItem("user_mobile", response.data.mobile);
             localStorage.setItem("verified_status", response.data.verified);
 
             commit("AddSignInToken",response.data.token);
@@ -85,12 +85,12 @@ export default {
 
       console.log(data)
 
-      axios.post('http://localhost:9100/api/q-flix/create-account', data).then( response => {
+      axios.post('https://83b9599fb72c.ngrok.io/api/q-flix/create-account', data).then( response => {
 
             console.log(response.data)
             
             localStorage.setItem("verify_token", response.data.token);
-            localStorage.setItem("user_email_mobile", response.data.email_mobile);
+            localStorage.setItem("user_mobile", response.data.mobile);
             
             commit("AddVerifyToken",response.data.token);
 
@@ -109,12 +109,13 @@ export default {
 
       commit("AddError", null)
 
-      axios.post('http://localhost:9100/api/q-flix/verify-user',data).then( response => {
+      axios.post('https://83b9599fb72c.ngrok.io/api/q-flix/verify-user',data).then( response => {
 
         if(response.data.title === 'verified'){
 
           localStorage.setItem("sign_in_token", response.data.token);
-          localStorage.setItem("user_email_mobile", response.data.email_mobile);
+          localStorage.setItem('verified_status', response.data.verified);
+          localStorage.setItem("user_mobile", response.data.mobile);
 
           commit("AddSignInToken",response.data.token);
 
@@ -138,9 +139,28 @@ export default {
 
       })
     },
+    subscribe({commit},data) {
+
+      commit("AddError", null)
+
+      axios.post('https://83b9599fb72c.ngrok.io/api/q-flix/subscribe',data).then( response => {
+        
+        localStorage.setItem("subscribed", response.data.subscribe)
+        
+      }).catch( err => {
+
+        if(err.message === 'Request failed with status code 500'){
+
+          var error_email_mobile = 'Unknown Error'
+          console.log("Verify Error App: " + error_email_mobile);
+          commit("AddError", error_email_mobile)
+        }
+
+      })
+    },
     signOut({commit},data) {
 
-      axios.post('http://localhost:9100/api/q-flix/sign-out',data).then( response => {
+      axios.post('https://83b9599fb72c.ngrok.io/api/q-flix/sign-out',data).then( response => {
 
           if(response.data.title === 'SignedOut'){
 
