@@ -47,7 +47,7 @@ export default{
         }
     },
     methods:{
-      ...mapActions(["verify"]),
+      ...mapActions(["subscribe"]),
         isMobile() {
           if(/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
             return true
@@ -81,7 +81,7 @@ export default{
                     
                   });
 
-              this.verify({email_mobile:localStorage.getItem('user_email_mobile')})
+              this.subscribe({mobile:localStorage.getItem('user_mobile')})
 
             }
 
@@ -95,11 +95,11 @@ export default{
         }
     },
     computed:{
-      ...mapGetters(["sign_in_token"]),
+      ...mapGetters(["subscribed"]),
     },
     watch:{
-      sign_in_token(val){
-        if(val != null){
+      subscribed(val){
+        if(val === true){
 
           //Registration succesful
 

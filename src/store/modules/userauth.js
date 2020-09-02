@@ -4,12 +4,14 @@ export default {
   state: {
     err:null,
     sign_in_token:null,
-    verify_token:null
+    verify_token:null,
+    subscribed:null
   },
   getters: {
     err: state => state.err,
     sign_in_token: state => state.sign_in_token,
     verify_token: state => state.verify_token,
+    subscribed: state => state.subscribed
   },
   mutations: {
     AddSignInToken(state, data){
@@ -19,7 +21,11 @@ export default {
     AddVerifyToken(state, data){
 
       state.verify_token = data;
-  },
+    },
+    AddSubscription(state, data){
+
+      state.subscribed = data;
+    },
     AddError(state,data){
 
         state.err = data;
@@ -143,9 +149,16 @@ export default {
 
       commit("AddError", null)
 
-      axios.post('https://83b9599fb72c.ngrok.io/api/q-flix/subscribe',data).then( response => {
+      //headers credentials
+      let config = {
+        headers: {
+          Authorization: "Bearer MiqusybzGx15yt8KzK3o8pgSosAJ",
+        }
+      }
+      axios.post('https://83b9599fb72c.ngrok.io/api/q-flix/subscribe',data,config).then( response => {
         
-        localStorage.setItem("subscribed", response.data.subscribe)
+        localStorage.setItem("subscribed", response.data.subscribed)
+        commit("AddSubscription", response.data.subscribed)
         
       }).catch( err => {
 
