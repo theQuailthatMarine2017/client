@@ -16,10 +16,14 @@
             <v-card ref="validate" style="text-align:center;" class="mt-5">
                 <img style="margin-top:19px;" src="https://www.optima.co.ke/web/image/product.template/50/image?unique=ef17b70" height="150px">
                 <h3 style="text-align:center;">Pay Your Monthly Subscription with Mpesa Online!</h3>
-                <p style="text-align:center;font-weight:bold">Your Monthly Subscription of KSH 350 Will Be Charged To 0705009784.</p>
+                <p style="text-align:center;font-weight:bold">Your Monthly Subscription of KSH 350 Will Be Charged To {{ mobile }}.</p>
                 <p style="text-align:center;font-weight:bold">Please Have Your Mobile With You To Complete Payment Proccess.</p>
+                <v-card-actions>
+                <v-btn block color="black" @click="recaptcha" style="color:white;">Click Here To Pay Subscription</v-btn>
+                </v-card-actions>
+                <p style="text-align:center;font-weight:bold">Dont Have Access Or No Funds On The Above Mobile Number?</p>
           <v-card-actions>
-            <v-btn block color="black" @click="recaptcha" style="color:white;">Click Here To Pay Subscription</v-btn>
+            <v-btn block color="black" @click="recaptcha" style="color:white;">Click Here To Pay Subscription Using Different Mobile</v-btn>
           </v-card-actions>
         </v-card>
   
@@ -37,12 +41,17 @@ import { mapActions,mapGetters } from "vuex";
 export default{
     mounted(){
 
-        console.log(localStorage.getItem('verify_token'))
-        console.log(localStorage.getItem('user_email_mobile'))
+        console.log(localStorage.getItem('sign_in_token'))
+        console.log(localStorage.getItem('user_mobile'))
+
+        this.mobile = localStorage.getItem('user_mobile')
     },
     data(){
         return{
-            name:null
+            name:null,
+            alternate:null,
+            mobile:null,
+            subscriptionTypes:'One Month'
 
         }
     },
@@ -58,17 +67,8 @@ export default{
         async recaptcha() {
 
 
-          if(this.name != null){
+          if(localStorage.getItem('sign_in_token') != null){
 
-            // (optional) Wait until recaptcha has been loaded.
-            await this.$recaptchaLoaded()
-
-            // Execute reCAPTCHA with action "login".
-            const token = await this.$recaptcha('login')
-
-            // Do stuff with the received token.
-            console.log(token)
-            if(token != null){
 
               this.loader = this.$loading.show({
                     // Optional parameters
@@ -81,17 +81,14 @@ export default{
                     
                   });
 
-              this.subscribe({mobile:localStorage.getItem('user_mobile')})
+              this.subscribe({mobile:localStorage.getItem('user_mobile'),subcription:this.subscriptionTypes})
 
-            }
 
-          }else{
+         
+        } else {
 
-            this.$swal('Alert!',
-              'Please Enter Email or Mobile You Registered With',
-              'warning');
-              
-          }
+          localStorage.clear()
+          this.$router.push('/')
         }
     },
     computed:{
@@ -103,7 +100,7 @@ export default{
 
           //Registration succesful
 
-          this.loader.hide()
+          this.load// Check if second payment option is been useder.hide()
           this.$router.push('/')
           
         }
@@ -116,6 +113,8 @@ export default{
         }
       }
     }
+  }
+
 }
 
 </script>

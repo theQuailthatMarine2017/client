@@ -47,13 +47,14 @@ export default {
       console.log(data)
 
       commit("AddError", null)
-          axios.post('https://83b9599fb72c.ngrok.io/api/q-flix/login-user', data).then( response => {
+          axios.post('https://07409e7ea5cc.ngrok.io/api/q-flix/login-user', data).then( response => {
 
             console.log(response.data);
             
             localStorage.setItem("sign_in_token", response.data.token);
             localStorage.setItem("user_mobile", response.data.mobile);
             localStorage.setItem("verified_status", response.data.verified);
+            localStorage.setItem("subscribed", response.data.subscribed);
 
             commit("AddSignInToken",response.data.token);
 
@@ -91,12 +92,13 @@ export default {
 
       console.log(data)
 
-      axios.post('https://83b9599fb72c.ngrok.io/api/q-flix/create-account', data).then( response => {
+      axios.post('https://07409e7ea5cc.ngrok.io/api/q-flix/create-account', data).then( response => {
 
             console.log(response.data)
             
             localStorage.setItem("verify_token", response.data.token);
             localStorage.setItem("user_mobile", response.data.mobile);
+            
             
             commit("AddVerifyToken",response.data.token);
 
@@ -115,7 +117,7 @@ export default {
 
       commit("AddError", null)
 
-      axios.post('https://83b9599fb72c.ngrok.io/api/q-flix/verify-user',data).then( response => {
+      axios.post('https://07409e7ea5cc.ngrok.io/api/q-flix/verify-user',data).then( response => {
 
         if(response.data.title === 'verified'){
 
@@ -152,10 +154,10 @@ export default {
       //headers credentials
       let config = {
         headers: {
-          Authorization: "Bearer MiqusybzGx15yt8KzK3o8pgSosAJ",
+          Authorization: "Bearer V4dk5xkrrZCK7erykA3BopOxB3pV",
         }
       }
-      axios.post('https://83b9599fb72c.ngrok.io/api/q-flix/subscribe',data,config).then( response => {
+      axios.post('https://07409e7ea5cc.ngrok.io/api/q-flix/subscribe',data,config).then( response => {
         
         localStorage.setItem("subscribed", response.data.subscribed)
         commit("AddSubscription", response.data.subscribed)
@@ -173,7 +175,7 @@ export default {
     },
     signOut({commit},data) {
 
-      axios.post('https://83b9599fb72c.ngrok.io/api/q-flix/sign-out',data).then( response => {
+      axios.post('https://07409e7ea5cc.ngrok.io/api/q-flix/sign-out',data).then( response => {
 
           if(response.data.title === 'SignedOut'){
 
@@ -188,11 +190,11 @@ export default {
 
           var error = 'Unknown Error'
           console.log("Request Error App: " + error);
-           commit("AddError", error)
+          commit("AddError", error)
        }
 
-            console.log("Request Error App: " + err);
-            commit("AddError", err.title)
+          console.log("Request Error App: " + err);
+          commit("AddError", err.title)
           
 
       })
